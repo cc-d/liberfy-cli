@@ -1,5 +1,5 @@
-import api.authrequests
-import api.project
-import api.syncdir
-import api.user
-import api.token
+import api.authhttpx as authhttpx
+import api.project as project
+import api.syncdir as syncdir
+import api.user as user
+import api.token as token

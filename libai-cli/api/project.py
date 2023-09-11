@@ -1,16 +1,22 @@
-from api import authrequests
-import requests
-from requests import Response
-from typing import Optional, Dict
+from api import authhttpx
+from api.authhttpx import resp_exceptions
+import httpx
+from httpx import Response
+from typing import Optional, Dict, List, Union, Any, Tuple
+from logfunc import logf
+from schemas import ProjectOut, ProjectNew
 
 
-def create_project(name: str) -> Response:
-    return authrequests.post("/p/new", json={"name": name})
+@logf()
+async def create(name: str) -> Response:
+    return await authhttpx.post("/p/new", json={"name": name})
 
 
-def get_all_projects() -> Response:
-    return authrequests.get("/p/all")
+@logf()
+async def all() -> List[ProjectOut]:
+    return await authhttpx.get("/p/all")
 
 
-def get_project(project_id: str) -> Response:
-    return authrequests.get(f"/p/{project_id}")
+@logf()
+async def get(project_id: str) -> Response:
+    return await authhttpx.get(f"/p/{project_id}")

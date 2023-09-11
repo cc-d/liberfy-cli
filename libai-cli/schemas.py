@@ -1,14 +1,14 @@
 from typing import List, Union, Optional
 from dataclasses import dataclass
+from pydantic import BaseModel
 
 
-@dataclass
-class Token:
+class Token(BaseModel):
     access_token: str
     token_type: str = 'bearer'
 
 
-class TokenLogin:
+class TokenLogin(BaseModel):
     username: str
     password: str
     grant_type: str = 'password'
@@ -17,7 +17,7 @@ class TokenLogin:
     client_secret: str = ''
 
 
-class UserBase:
+class UserBase(BaseModel):
     email: str
 
 
@@ -25,7 +25,6 @@ class UserNew(UserBase):
     password: str
 
 
-@dataclass
 class UserOut(UserBase):
     id: str
 
@@ -39,7 +38,7 @@ class UserOutToken(UserOut):
     token: Token
 
 
-class ProjectBase:
+class ProjectBase(BaseModel):
     pass
 
 
@@ -53,11 +52,11 @@ class ProjectOut(ProjectNew):
 
 
 class ProjectDB(ProjectOut):
-    user: 'UserDB'
+    user: UserDB
     syncdirs: List['SyncDirDB']
 
 
-class SyncDirBase:
+class SyncDirBase(BaseModel):
     path: str
 
 
@@ -65,7 +64,7 @@ class SyncDirCreate(SyncDirBase):
     project_id: str
 
 
-class DirFileBase:
+class DirFileBase(BaseModel):
     relpath: str
     content: Optional[str]
 
@@ -73,7 +72,6 @@ class DirFileBase:
 class DirFileCreate(DirFileBase):
     syncdir_id: str
     checksum: str
-    checksum_type: str = 'md5'
 
 
 class DirFileOut(DirFileCreate):
@@ -92,3 +90,4 @@ class SyncDirDB(SyncDirOut):
 
 class DirFileDB(DirFileOut):
     syncdir: 'SyncDirDB'
+    checksum_type: str = 'md5'

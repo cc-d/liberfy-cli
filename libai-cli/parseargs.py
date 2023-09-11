@@ -1,6 +1,8 @@
 import argparse
+from logfunc import logf
 
 
+@logf()
 def setup_argparse() -> argparse.ArgumentParser:
     """
     Set up argparse for Liberfy CLI.
@@ -42,6 +44,9 @@ def setup_argparse() -> argparse.ArgumentParser:
         "project", aliases=["p"], help="Manage projects ('/project')."
     )
     project_subparsers = project.add_subparsers(dest="act")
+    project_all = project_subparsers.add_parser(
+        "all", aliases=["a"], help="Get all projects ('/project/all')."
+    )
 
     create_project = project_subparsers.add_parser(
         "create",
@@ -49,8 +54,13 @@ def setup_argparse() -> argparse.ArgumentParser:
         help="Create a new project ('/project/create').",
     )
     create_project.add_argument(
-        "--n", default="DefaultProjectName", help="Name"
+        "name", default="DefaultProjectName", help="Name"
     )
+    get_project = project_subparsers.add_parser(
+        "get", aliases=["g"], help="Get project ('/project/get')."
+    )
+
+    get_project.add_argument("project_id", help="Project ID")
 
     # SyncDir Commands
     syncdir = subparsers.add_parser(
