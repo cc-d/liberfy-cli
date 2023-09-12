@@ -23,7 +23,7 @@ async def tokenlogin(email: str, password: str) -> Token:
 @logf()
 async def create(email: str, password: str) -> UserOutToken:
     resp = await authhttpx.post(
-        "/u/new", json={"email": email, "password": password}
+        "/u/new", json={"username": email, "password": password}
     )
     utoken = UserOutToken(**resp)
     await save_token(utoken.token.access_token)

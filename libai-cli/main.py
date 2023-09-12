@@ -4,17 +4,19 @@ import argparse
 import asyncio
 from typing import Optional
 from parseargs import setup_argparse
+from logfunc import logf
 from api import user, token as apitoken, authhttpx, project, syncdir
 from utils import printinfo, apicmd
 
 
+@logf()
 async def async_main():
     parser = setup_argparse()
-    args = parser.parse_args()
 
-    args.cmd = args.cmd.lower() if args.cmd is not None else None
-    result = await apicmd(args)
+    result = await apicmd(parser)
+
     print(result)
+    return result
 
 
 if __name__ == "__main__":

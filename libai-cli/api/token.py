@@ -4,7 +4,9 @@ import os
 
 from logfunc import logf
 from typing import Optional
-from config import TOKEN_PATH, BASE_URL
+from config import Paths
+
+TOKEN_PATH = Paths.TOKEN_PATH
 
 
 @logf()

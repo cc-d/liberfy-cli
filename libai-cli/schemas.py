@@ -1,11 +1,22 @@
-from typing import List, Union, Optional
-from dataclasses import dataclass
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Optional
+from datetime import datetime
+from enum import Enum
 
 
+# Enum Definitions
+class TokenType(str, Enum):
+    bearer = "bearer"
+
+
+class ChecksumType(str, Enum):
+    md5 = "md5"
+
+
+# Token
 class Token(BaseModel):
     access_token: str
-    token_type: str = 'bearer'
+    token_type: TokenType = TokenType.bearer
 
 
 class TokenLogin(BaseModel):
@@ -17,12 +28,13 @@ class TokenLogin(BaseModel):
     client_secret: str = ''
 
 
+# User
 class UserBase(BaseModel):
     email: str
 
 
 class UserNew(UserBase):
-    password: str
+    password: str = Field(..., min_length=8)
 
 
 class UserOut(UserBase):
@@ -31,13 +43,17 @@ class UserOut(UserBase):
 
 class UserDB(UserOut):
     hpassword: str
-    projects: List['ProjectDB']
+    projects: list['ProjectDB']
+
+    class Config:
+        orm_mode = True
 
 
 class UserOutToken(UserOut):
     token: Token
 
 
+# Project
 class ProjectBase(BaseModel):
     pass
 
@@ -53,9 +69,13 @@ class ProjectOut(ProjectNew):
 
 class ProjectDB(ProjectOut):
     user: UserDB
-    syncdirs: List['SyncDirDB']
+    syncdirs: list['SyncDirDB'] = []
+
+    class Config:
+        orm_mode = True
 
 
+# SyncDir / DirFile
 class SyncDirBase(BaseModel):
     path: str
 
@@ -67,11 +87,13 @@ class SyncDirCreate(SyncDirBase):
 class DirFileBase(BaseModel):
     relpath: str
     content: Optional[str]
+    last_updated: datetime = datetime.now()
 
 
 class DirFileCreate(DirFileBase):
     syncdir_id: str
     checksum: str
+    checksum_type: ChecksumType
 
 
 class DirFileOut(DirFileCreate):
@@ -80,14 +102,19 @@ class DirFileOut(DirFileCreate):
 
 class SyncDirOut(SyncDirCreate):
     id: str
-    dirfiles: List[DirFileOut]
     user_id: str
+    dirfiles: list[DirFileOut] = []
 
 
 class SyncDirDB(SyncDirOut):
-    project: 'ProjectDB'
+    project: ProjectDB
+
+    class Config:
+        orm_mode = True
 
 
 class DirFileDB(DirFileOut):
-    syncdir: 'SyncDirDB'
-    checksum_type: str = 'md5'
+    syncdir: SyncDirDB
+
+    class Config:
+        orm_mode = True

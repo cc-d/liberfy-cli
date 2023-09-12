@@ -1,14 +1,24 @@
 import argparse
 import asyncio
 from typing import Dict, Optional
-from logfunc import logf
+
 import httpx
-from api import authhttpx, project, syncdir, token as apitoken, user
+from api import authhttpx, project, syncdir
+from api import token as apitoken
+from api import user
 from httpx import Response
+from logfunc import logf
 
 
 async def printinfo() -> None:
-    token = apitoken.load_token()
+    async def lr(word: str, n=5, useprint=True):
+        pstr = "\n%s %s %s\n" % ("=" * n, word, "=" * n)
+        if useprint:
+            print(pstr)
+        return pstr
+
+    await lr('INFO')  # ==== INFO ====
+    token = await apitoken.load_token()
     if token:
         print(f"Currently saved token: {token}")
     else:
@@ -16,8 +26,13 @@ async def printinfo() -> None:
 
 
 @logf()
-async def apicmd(parseargs):
-    args = parseargs
+async def apicmd(parser: argparse.ArgumentParser):
+    args = parser.parse_args()
+
+    if not hasattr(args, 'cmd') or args.cmd is None:
+        parser.print_help()
+        return
+
     if args.cmd.startswith('u'):
         act = args.act if args.act is not None else ''
         if act.startswith('c'):
@@ -39,10 +54,14 @@ async def apicmd(parseargs):
     elif args.cmd.startswith('s'):
         act = args.act if args.act is not None else ''
         if act.startswith('c'):
-            return await syncdir.create_syncdir(args.project_id, args.path)
+            return await syncdir.create(args.project_id, args.path)
         elif act.startswith('a'):
-            return await syncdir.get_all_syncdirs(args.project_id)
+            return await syncdir.all(args.project_id)
         elif act.startswith('g'):
-            return await syncdir.get_syncdir(args.project_id, args.syncdir_id)
-    elif args.cmd == "info":
+            return await syncdir.get(args.project_id, args.syncdir_id)
+    elif args.cmd.startswith('i'):
         return await printinfo()
+    else:
+        parser.print_help()
+        return
+    return

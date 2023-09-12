@@ -101,4 +101,9 @@ def setup_argparse() -> argparse.ArgumentParser:
     create_dirfile.add_argument("--cs", required=True, help="Checksum")
     create_dirfile.add_argument("--cst", default="md5", help="Checksum Type")
 
+    # Info Commands
+    info = subparsers.add_parser(
+        "info", aliases=["i"], help="Get info of current liberfy-cli install"
+    )
+
     return parser
