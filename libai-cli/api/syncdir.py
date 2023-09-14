@@ -1,4 +1,4 @@
-from api import authhttpx
+from .utils import authhttpx
 import httpx
 from httpx import Response
 from typing import Optional, Dict

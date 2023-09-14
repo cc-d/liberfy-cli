@@ -1,13 +1,15 @@
 import httpx
+
 from logfunc import logf
 from httpx import Response, HTTPError
 from typing import Optional, Dict, Any
+
+import utils.jwttoken as tokenutils
 from config import BASE_URL
-from .token import load_token, save_token, delete_token
 
 
 @logf()
-async def resp_exceptions(resp: Response) -> None:
+async def _raise_excepts(resp: Response) -> None:
     """Check if the response has an HTTP error and raise appropriate exception."""
     try:
         resp.raise_for_status()
@@ -16,7 +18,7 @@ async def resp_exceptions(resp: Response) -> None:
             raise HTTPError(f"400 Bad Request: {resp.text}")
         elif resp.status_code == 401:
             if resp.url.path == '/u/me':
-                await delete_token()
+                await tokenutils.remove()
             raise HTTPError(f"401 Unauthorized: {resp.text}")
         elif resp.status_code == 404:
             raise HTTPError(f"404 Not Found: {resp.text}")
@@ -27,7 +29,7 @@ async def resp_exceptions(resp: Response) -> None:
 
 @logf()
 async def _inject_auth(kwargs: Dict[str, Any]) -> Dict[str, Any]:
-    token = await load_token()
+    token = await tokenutils.read()
     if token:
         headers = kwargs.get('headers', {})
         headers.update({'Authorization': f"Bearer {token}"})
@@ -36,15 +38,28 @@ async def _inject_auth(kwargs: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @logf()
-async def _method(method: str, url: str, *args, **kwargs) -> Dict[str, Any]:
+async def _method(method: str, url: str, **kwargs) -> Dict[str, Any]:
+    url = '%s%s' % (BASE_URL, url) if not url.startswith('http') else url
     method = str(method).lower()
     if method != 'options':
         kwargs = await _inject_auth(kwargs)
+    reqdata = kwargs.get('data', None)
+    reqdata = reqdata if reqdata is not None else kwargs.get('json', None)
+    kwargs = {k: v for k, v in kwargs.items() if k not in ['data', 'json']}
+
     async with httpx.AsyncClient() as client:
-        resp = await getattr(client, method)(
-            f"{BASE_URL}{url}", *args, **kwargs
-        )
-    await resp_exceptions(resp)
+        usemethod = getattr(client, method)
+
+        if method != 'options' and reqdata is not None:
+            resp = await usemethod(
+                url, data=reqdata, headers=kwargs.get('headers', {})
+            )
+        elif method == 'options':
+            resp = await usemethod(url)
+        else:
+            resp = await usemethod(url, headers=kwargs.get('headers', {}))
+
+    await _raise_excepts(resp)
     return resp.json()
 
 

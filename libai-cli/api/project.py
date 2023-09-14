@@ -1,10 +1,10 @@
-from api import authhttpx
-from api.authhttpx import resp_exceptions
-import httpx
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 from httpx import Response
-from typing import Optional, Dict, List, Union, Any, Tuple
 from logfunc import logf
-from schemas import ProjectOut, ProjectNew
+from schemas import ProjectNew, ProjectOut
+
+from .utils import authhttpx
 
 
 @logf()

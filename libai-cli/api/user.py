@@ -1,12 +1,11 @@
-from api import authhttpx
-from api.authhttpx import BASE_URL
-import httpx
-from logfunc import logf
-from .token import save_token, load_token, delete_token
+from typing import Dict, Optional
+
+import utils.jwttoken as tokenutils
 from httpx import Response
-from typing import Optional, Dict
-from schemas import UserOutToken, UserOut, Token
-from api.authhttpx import resp_exceptions
+from logfunc import logf
+from schemas import Token, UserOut, UserOutToken
+
+from .utils import authhttpx
 
 
 @logf()
@@ -16,7 +15,7 @@ async def tokenlogin(email: str, password: str) -> Token:
             "/u/tokenlogin", json={"username": email, "password": password}
         )
     )
-    await save_token(tok.access_token)
+    await tokenutils.write(tok.access_token)
     return tok
 
 
@@ -26,7 +25,7 @@ async def create(email: str, password: str) -> UserOutToken:
         "/u/new", json={"username": email, "password": password}
     )
     utoken = UserOutToken(**resp)
-    await save_token(utoken.token.access_token)
+    await tokenutils.write(utoken.token.access_token)
     return utoken
 
 

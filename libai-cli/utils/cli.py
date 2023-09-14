@@ -3,11 +3,12 @@ import asyncio
 from typing import Dict, Optional
 
 import httpx
-from api import authhttpx, project, syncdir
-from api import token as apitoken
-from api import user
+from api import project, syncdir, user
+from api.utils import authhttpx
 from httpx import Response
 from logfunc import logf
+
+from . import jwttoken
 
 
 async def printinfo() -> None:
@@ -18,7 +19,7 @@ async def printinfo() -> None:
         return pstr
 
     await lr('INFO')  # ==== INFO ====
-    token = await apitoken.load_token()
+    token = await jwttoken.read()
     if token:
         print(f"Currently saved token: {token}")
     else:
@@ -28,7 +29,9 @@ async def printinfo() -> None:
 @logf()
 async def apicmd(parser: argparse.ArgumentParser):
     args = parser.parse_args()
-
+    print(args)
+    for k, v in args.__dict__.items():
+        print(k, v)
     if not hasattr(args, 'cmd') or args.cmd is None:
         parser.print_help()
         return
