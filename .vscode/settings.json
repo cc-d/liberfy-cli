@@ -1,5 +1,9 @@
 {
     "workbench.colorCustomizations": {
         "sideBarSectionHeader.background": "#0008a33f"
-    }
+    },
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.formatting.provider": "black"
 }
