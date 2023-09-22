@@ -1,8 +1,8 @@
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import List
 
 from httpx import Response
 from logfunc import logf
-from schemas import ProjectNew, ProjectOut
+from schemas import ProjectOut
 
 from .utils import authhttpx
 
