@@ -8,7 +8,7 @@ from schemas import Token, UserOut, UserOutToken
 from .utils import authhttpx
 
 
-@logf()
+@logf(level='info', logargs=False)
 async def tokenlogin(email: str, password: str) -> Token:
     tok = Token(
         **await authhttpx.post(
@@ -19,7 +19,7 @@ async def tokenlogin(email: str, password: str) -> Token:
     return tok
 
 
-@logf()
+@logf(level='info')
 async def create(email: str, password: str) -> UserOutToken:
     resp = await authhttpx.post(
         "/u/new", json={"username": email, "password": password}
