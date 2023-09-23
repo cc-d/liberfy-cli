@@ -1,6 +1,6 @@
 import os
 import sys
-from os.path import join as opjoin, dirname, abspath, exists, expanduser
+from os.path import join as opjoin, expanduser
 
 
 BASE_URL = "http://localhost:8888"
