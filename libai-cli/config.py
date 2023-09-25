@@ -1,5 +1,3 @@
-import os
-import sys
 from os.path import join as opjoin, expanduser
 
 
