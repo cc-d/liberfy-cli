@@ -1,6 +1,5 @@
 from typing import Dict, Optional
 
-import httpx
 from httpx import Response
 from logfunc import logf
 
