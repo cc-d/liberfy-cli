@@ -1,7 +1,6 @@
 from typing import Dict, Optional
 
 import utils.jwttoken as tokenutils
-from httpx import Response
 from logfunc import logf
 from schemas import Token, UserOut, UserOutToken
 
